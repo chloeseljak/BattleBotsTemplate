@@ -18,6 +18,21 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 class Bot(ABot):
     def create_user(self, session_info):
+        self.keyword_posted = False
+        self.influence_keywords = []
+        
+        metadata = {}
+        if isinstance(session_info, dict):
+            metadata = session_info.get("metadata", {})
+        elif hasattr(session_info, "metadata"):
+            metadata = session_info.metadata
+
+        topics = metadata.get("topics", [])
+        # Loop over each topic and extract its keywords.
+        for topic in topics:
+            if isinstance(topic, dict):
+                keywords = topic.get("keywords", [])
+                self.influence_keywords.extend(keywords)
         """
         This function creates a list of bot users.
         It modifies usernames using the modify_username method.
@@ -116,7 +131,26 @@ class Bot(ABot):
                     user=user
                 )
                 new_posts.append(new_post)
+                for kw in self.influence_keywords:
+                    if kw.lower() in text.lower():
+                        self.keyword_posted = True
+                        break
+
                 logging.info(f"Generated post for user {user.username} at {created_at}: {text}")
+                # If after generating posts no keyword has been used, force one post with a keyword
+        
+        if not self.keyword_posted and self.influence_keywords:
+            chosen_keyword = random.choice(self.influence_keywords)
+            forced_text = f"Let's talk about {chosen_keyword}!"
+            forced_post = NewPost(
+                text=forced_text,
+                author_id=users_list[0].user_id,
+                created_at=self.generate_timestamp(),
+                user=users_list[0]
+            )
+            new_posts.append(forced_post)
+            self.keyword_posted = True
+            logging.info(f"Forced keyword post: {forced_text}")
 
         logging.info(f"Total new posts generated in this sub-session: {len(new_posts)}")
         return new_posts
