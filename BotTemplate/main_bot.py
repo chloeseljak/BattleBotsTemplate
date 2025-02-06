@@ -11,12 +11,12 @@ from api_requests import get_session_info, create_user_id, get_sub_session, subm
 import json
 
 # Competition Environment Variables
-# session_id = int(os.getenv('SESSION_ID'))
-# code_max_time = int(os.getenv('MAX_TIME'))
+session_id = int(os.getenv('SESSION_ID'))
+code_max_time = int(os.getenv('MAX_TIME'))
 
 # Testing Environment Variables
-session_id = 1
-code_max_time = 3601
+# session_id = 1
+# code_max_time = 3601
 
 logging.basicConfig(
     filename='run.log',
