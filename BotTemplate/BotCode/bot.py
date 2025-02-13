@@ -11,21 +11,17 @@ import nltk
 from nltk.corpus import wordnet
 import openai
 import os
+import time 
 nltk.download('wordnet', quiet=True)
 
 
 # Configure logging
 # Configure logging
-logging.basicConfig(
-    filename='run.log',
-    filemode='w',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+
 sys.stdout.reconfigure(encoding='utf-8')
 
 # Set your OpenAI API key (ensure you keep it secure)
-openai.api_key= os.getenv('ENV_VAR1')
+
 
 def generate_timestamp(base_timestamp=None, min_delay=10, max_delay=300):
     """
@@ -64,7 +60,7 @@ class Bot(ABot):
             "You are a creative profile generator that creates social media profiles which mimic genuine human behavior. "
             "Below are examples of existing profiles:\n"
             f"{examples}\n"
-            "Based on these examples, please generate 5 new user profiles. Each profile should have:\n"
+            "Based on these examples, please generate 2 new user profiles. Each profile should have:\n"
             "  - A 'username' that does not include the word 'bot' or any hint of automation.\n"
             "  - A natural-sounding full 'name'.\n"
             "  - A short, genuine 'description'.\n"
@@ -72,6 +68,7 @@ class Bot(ABot):
         )
 
         try:
+            time.sleep(2)
             response = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=[
@@ -82,7 +79,7 @@ class Bot(ABot):
                 max_tokens=300  # Adjust this value based on response size
             )
             result_text = response.choices[0].message.content.strip()
-            logging.info(f"ChatGPT response: {result_text}")
+            print((f"ChatGPT response: {result_text}"))
             # Parse the JSON response (ensure GPT returns a valid JSON array)
             profiles = json.loads(result_text)
             return profiles
@@ -92,6 +89,7 @@ class Bot(ABot):
             return []
 
     def create_user(self, session_info):
+        print("create User called")
         """
         Called once at the start of the session.
         - Extracts influence keywords (if needed) from session_info.metadata.topics.
@@ -112,7 +110,7 @@ class Bot(ABot):
             if isinstance(topic, dict):
                 keywords = topic.get("keywords", [])
                 self.influence_keywords.extend(keywords)
-        logging.info(f"Extracted influence keywords: {self.influence_keywords}")
+        print(f"Extracted influence keywords: {self.influence_keywords}")
 
         if not hasattr(session_info, 'users'):
             logging.error("No user data found in session_info.")
@@ -120,7 +118,6 @@ class Bot(ABot):
 
         # Get all existing user profiles as examples from the session
         users_data = session_info.users
-
         # Use ChatGPT-4 to generate 5 new profiles based on the examples from users_data
         generated_profiles = self.generate_human_profiles_from_dataset(users_data)
         new_users = []
@@ -132,7 +129,7 @@ class Bot(ABot):
                 description=profile.get("description", "No description provided.")
             )
             new_users.append(new_user)
-            logging.info(f"Created user: {new_user.username} with name: {new_user.name} and description: {new_user.description}")
+            print(f"Created user: {new_user.username} with name: {new_user.name} and description: {new_user.description}")
 
         return new_users
 
@@ -155,6 +152,7 @@ class Bot(ABot):
         delay = random.randint(min_delay, max_delay)
         dt += timedelta(seconds=delay)
         return dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    
     def generate_tweet_text(self, average_length, max_retries=3):
         """
         Generates a tweet using the OpenAI API (GPT-4).
@@ -186,7 +184,7 @@ class Bot(ABot):
                     max_tokens=150  # Limit the response length
                 )
                 tweet_text = response.choices[0].message.content.strip()
-                logging.info(f"Generated tweet: {tweet_text}")
+                print(f"Generated tweet: {tweet_text}")
                 return tweet_text
             except Exception as e:
                 logging.error(f"Attempt {attempt + 1} failed: Error calling OpenAI API - {e}")
@@ -202,11 +200,11 @@ class Bot(ABot):
           - The tweets are generated to be approximately the average length, not replies, and
             (if possible) mention one of the session's influence keywords.
         """
-        logging.info(f"Received dataset of type: {type(datasets_json)}")
+        print(f"Received dataset of type: {type(datasets_json)}")
 
         try:
             posts_dataset = datasets_json.posts  # List of post dictionaries
-            logging.info(f"Number of posts in sub-session: {len(posts_dataset)}")
+            print(f"Number of posts in sub-session: {len(posts_dataset)}")
         except AttributeError as e:
             logging.error(f"Dataset is missing required attributes: {e}")
             return []
@@ -220,7 +218,7 @@ class Bot(ABot):
                 total_length += len(text)
                 count += 1
         average_length = total_length // count if count > 0 else 100
-        logging.info(f"Calculated average tweet length: {average_length}")
+        print(f"Calculated average tweet length: {average_length}")
 
         new_posts = []
         # Generate 10 tweets for each user (instead of a random 1 to 3 posts)
@@ -235,7 +233,7 @@ class Bot(ABot):
                     user=user
                 )
                 new_posts.append(new_post)
-                logging.info(f"Generated tweet for user {user.username} at {created_at}: {tweet_text}")
+                print(f"Generated tweet for user {user.username} at {created_at}: {tweet_text}")
 
-        logging.info(f"Total tweets generated in this sub-session: {len(new_posts)}")
+        print(f"Total tweets generated in this sub-session: {len(new_posts)}")
         return new_posts
