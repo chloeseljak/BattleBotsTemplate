@@ -3,16 +3,15 @@ import requests
 import json
 
 # Competition Environment Variables
-base_url = os.getenv('BASE_URL')
-authentication_token = os.getenv('AUTH_TOKEN')
-session_id = os.getenv('SESSION_ID')
+# base_url = os.getenv('BASE_URL')
+# authentication_token = os.getenv('AUTH_TOKEN')
+# session_id = os.getenv('SESSION_ID')
 
 # Testing Environment Variables
-# base_url = 'http://3.92.68.65:3000/api/test/1'
+base_url = 'http://3.92.68.65:3000/api/test/1'
 
-# authentication_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZWFtSWQiOiIxOCIsInRlYW1OYW1lIjoiY2hsb2Vib3QxIiwiaWF0IjoxNzM4ODY0MzQzLCJleHAiOjE3Mzg5NTA3NDN9.3tNbkF-LNHxba1upO_AfHMK4Wtrax6yWgSoTHYSE04A"
-
-# session_id = 1
+authentication_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZWFtSWQiOiIxOCIsInRlYW1OYW1lIjoiY2hsb2Vib3QxIiwiaWF0IjoxNzM5NDc1NzgwLCJleHAiOjE3Mzk1NjIxODB9.RfvQz-2FXqkQzLJWotSyefw6EX90Gj20rJtmykuiobI"
+session_id = 1
 
 header = {'Authorization': 'bearer ' + authentication_token, 'Content-Type': 'application/json'}
 
