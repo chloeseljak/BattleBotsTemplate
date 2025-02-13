@@ -19,9 +19,7 @@ nltk.download('wordnet', quiet=True)
 # Configure logging
 
 sys.stdout.reconfigure(encoding='utf-8')
-
-# Set your OpenAI API key (ensure you keep it secure)
-
+openai.api_key= os.getenv('ENV_VAR1')
 
 def generate_timestamp(base_timestamp=None, min_delay=10, max_delay=300):
     """
