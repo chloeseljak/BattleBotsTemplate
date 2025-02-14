@@ -67,19 +67,21 @@ class Bot(ABot):
 
         try:
             time.sleep(2)
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
+            response = openai.chat.completions.create(
+                model="gpt-4o", 
                 messages=[
                     {"role": "system", "content": "You are a creative profile generator for social media profiles."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.8,
-                max_tokens=300  # Adjust this value based on response size
+                max_tokens=300  # Adjust based on response size
             )
             result_text = response.choices[0].message.content.strip()
             print((f"ChatGPT response: {result_text}"))
             # Parse the JSON response (ensure GPT returns a valid JSON array)
+            result_text = re.sub(r"^```json\s*|\s*```$", "", result_text).strip()
             profiles = json.loads(result_text)
+            
             return profiles
         except Exception as e:
             logging.error(f"Error calling ChatGPT API: {e}")
@@ -118,7 +120,10 @@ class Bot(ABot):
         users_data = session_info.users
         # Use ChatGPT-4 to generate 5 new profiles based on the examples from users_data
         generated_profiles = self.generate_human_profiles_from_dataset(users_data)
+        print("PROFILES")
+        print(generated_profiles)
         new_users = []
+        
         for profile in generated_profiles:
             # Expecting each profile to be a dict with keys: username, name, description.
             new_user = NewUser(
@@ -172,8 +177,8 @@ class Bot(ABot):
 
         for attempt in range(max_retries):
             try:
-                response = openai.ChatCompletion.create(
-                    model="gpt-4",
+                response = openai.chat.completions.create(
+                    model="gpt-4o", 
                     messages=[
                         {"role": "system", "content": "You are a creative assistant for generating social media posts."},
                         {"role": "user", "content": prompt}
