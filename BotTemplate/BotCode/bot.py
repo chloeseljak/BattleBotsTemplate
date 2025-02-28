@@ -119,18 +119,18 @@ class Bot(ABot):
             new_users.append(new_user)
             #print(f"Created user: {new_user.username} with name: {new_user.name} and description: {new_user.description}")
         
-        with open("final_dataset5.json", "r", encoding="utf-8") as f:
-            final_data = json.load(f)
-        for user in new_users:
-            final_data["users"].append({
-            "username": user.username,
-            "name": user.name,
-            "description": user.description
-        # Add any additional fields if needed
-        })
-        # Write the updated dataset back to final_dataset5.json
-        with open("final_dataset5.json", "w", encoding="utf-8") as f:
-            json.dump(final_data, f, indent=4)            
+        # with open("final_dataset5.json", "r", encoding="utf-8") as f:
+        #     final_data = json.load(f)
+        # for user in new_users:
+        #     final_data["users"].append({
+        #     "username": user.username,
+        #     "name": user.name,
+        #     "description": user.description
+        # # Add any additional fields if needed
+        # })
+        # # Write the updated dataset back to final_dataset5.json
+        # with open("final_dataset5.json", "w", encoding="utf-8") as f:
+        #     json.dump(final_data, f, indent=4)            
         return new_users
     
     def generate_timestamp(self, start_time, end_time):
