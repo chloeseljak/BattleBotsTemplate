@@ -258,40 +258,96 @@ class Bot(ABot):
         text_v2 = self.add_random_punctuation(text_v1)  # Add punctuation variation
         return text_v2
 
-    
     def generate_content(self, datasets_json, users_list):
-        #print(self.influence_target) which returns {'topic': 'nhl', 'keywords': ['nhl', '#nhl', '#nhl hockey', '#hockey nhl', '#nhlhockey']}
-    
-        #Generate randomness and time of posts 
+        # self.influence_target example: {'topic': 'nhl', 'keywords': ['nhl', '#nhl', '#nhl hockey', '#hockey nhl', '#nhlhockey']}
+        
+        # Determine the current subsession's time boundaries.
         current_start_time = self.sub_sessions_info[self.cur_sub_session - 1]['start_time']
         current_end_time = self.sub_sessions_info[self.cur_sub_session - 1]['end_time']
-        num_subsessions= len(self.sub_sessions_info)
-        user = random.choice(users_list)
-        num_tweets = random.randint(10//num_subsessions, 60//num_subsessions) # min should be 10 / number subsession, max should be 150/ number subsession 
-        print(10//num_subsessions)
-        print(150//num_subsessions)
-        new_posts = []
+        num_subsessions = len(self.sub_sessions_info)
+        
+        all_new_posts = []
+        
+        # Process each user in the list.
+        for user in users_list:
+            # Set a base number of tweets for this user for the current subsession.
+            num_tweets = random.randint(10 // num_subsessions, 60 // num_subsessions)  # min: 10/num_subsessions, max: 150/num_subsessions 
+            
+            # If this is the last subsession, check the user's current post count.
+            if self.cur_sub_session == num_subsessions:
+                # Here we assume that the user object has an attribute 'posts' as a list.
+                current_post_count = len(user.posts) if hasattr(user, 'posts') else 0
+                if current_post_count < 10:
+                    # Calculate how many more posts are needed to reach a minimum of 10.
+                    additional_required = 10 - current_post_count
+                    num_tweets = max(num_tweets, additional_required)
+            
+            # Generate posts for this user.
+            for i in range(num_tweets):
+                # Decide whether to include a keyword in this tweet.
+                withKeyWord = False
+                if Bot.posts_about_keyword < 3:
+                    withKeyWord = True
+                
+                tweet_text = self.generate_tweet_text(datasets_json.posts, withKeyWord)
+                created_at = self.generate_timestamp(current_start_time, current_end_time)
+                
+                new_post = NewPost(
+                    text=tweet_text,
+                    author_id=user.user_id,
+                    created_at=created_at,
+                    user=user
+                )
+                all_new_posts.append(new_post)
+                
+                # If the tweet included a keyword, update the global counter.
+                if withKeyWord:
+                    Bot.posts_about_keyword += 1
+        
+        return all_new_posts
 
-        # Generate posts 
-        for i in range(num_tweets):
-            # Check for keyword inclusion on a per-tweet basis
-            withKeyWord = False
-            if Bot.posts_about_keyword < 3 :
-                withKeyWord = True
+    # def generate_content(self, datasets_json, users_list):
+    #     #print(self.influence_target) which returns {'topic': 'nhl', 'keywords': ['nhl', '#nhl', '#nhl hockey', '#hockey nhl', '#nhlhockey']}
+    
+    #     #Generate randomness and time of posts 
+    #     current_start_time = self.sub_sessions_info[self.cur_sub_session - 1]['start_time']
+    #     current_end_time = self.sub_sessions_info[self.cur_sub_session - 1]['end_time']
+    #     num_subsessions= len(self.sub_sessions_info)
+    #     user = random.choice(users_list)
+    #     num_subsessions = len(self.sub_sessions_info)
+    #     num_tweets = random.randint(10//num_subsessions, 60//num_subsessions) # min should be 10 / number subsession, max should be 150/ number subsession 
+        
+    #     for user in users_list:
+    #     if self.cur_sub_session == num_subsessions:
+    #         # Assuming user.posts is a list of current posts; adjust the attribute as needed.
+    #         current_post_count = len(user.posts) if hasattr(user, 'posts') else 0
+    #         if current_post_count < 10:
+    #             # Ensure that after this subsession, the user will have at least 10 posts.
+    #             additional_required = 10 - current_post_count
+    #             num_tweets = max(num_tweets, additional_required)
+        
+    #     new_posts = []
 
-            tweet_text = self.generate_tweet_text(datasets_json.posts, withKeyWord)
-            created_at = self.generate_timestamp(current_start_time, current_end_time)
-            new_post = NewPost(
-                text=tweet_text,
-                author_id=user.user_id,
-                created_at=created_at,
-                user=user
-            )
-            new_posts.append(new_post)
+    #     # Generate posts 
+    #     for i in range(num_tweets):
+    #         # Check for keyword inclusion on a per-tweet basis
+    #         withKeyWord = False
+    #         if Bot.posts_about_keyword < 3 :
+    #             withKeyWord = True
 
-            # If we used the keyword for this tweet, update the global counter
-            if withKeyWord:
-                Bot.posts_about_keyword += 1
+    #         tweet_text = self.generate_tweet_text(datasets_json.posts, withKeyWord)
+    #         created_at = self.generate_timestamp(current_start_time, current_end_time)
+    #         new_post = NewPost(
+    #             text=tweet_text,
+    #             author_id=user.user_id,
+    #             created_at=created_at,
+    #             user=user
+    #         )
+    #         new_posts.append(new_post)
+
+    #         # If we used the keyword for this tweet, update the global counter
+    #         if withKeyWord:
+    #             Bot.posts_about_keyword += 1
       
       #For saving to a file 
        
@@ -319,7 +375,7 @@ class Bot(ABot):
         # with open("final_dataset5.json", "w", encoding="utf-8") as f:
         #     json.dump(final_data, f, indent=4)
 
-        return new_posts
+        #return new_posts
 
 
 ## generate content :
