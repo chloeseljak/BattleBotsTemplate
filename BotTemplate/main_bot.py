@@ -18,6 +18,7 @@ code_max_time = int(os.getenv('MAX_TIME'))
 # session_id = 2
 # code_max_time = 3601
 
+
 logging.basicConfig(
     filename='run.log',
     filemode='w',

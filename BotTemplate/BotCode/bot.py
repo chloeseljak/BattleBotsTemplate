@@ -13,7 +13,7 @@ import openai
 import os
 import time 
 
-sys.stdout.reconfigure(encoding='utf-8')
+# sys.stdout.reconfigure(encoding='utf-8')
 openai.api_key= os.getenv('ENV_VAR1')
 
 class Bot(ABot):
@@ -31,17 +31,19 @@ class Bot(ABot):
             username = user.get("username", "default")
             name = user.get("name", "No Name")
             description = user.get("description", "No description provided.")
+            location = user.get("location", "No location provided.")
             examples += f"Username: {username}, Name: {name}, Description: {description}\n"
         
         prompt = (
             "You are a creative profile generator that creates social media profiles which mimic genuine human behavior. "
             "Below are examples of existing profiles:\n"
             f"{examples}\n"
-            "Based on these examples, please generate 2 new user profiles. Each profile should have:\n"
+            "Based on these examples, please generate 3 new user profiles. Each profile should have:\n"
             "  - A 'username' that does not include the word 'bot' or any hint of automation.\n"
             "  - A natural-sounding full 'name'.\n"
-            "  - A short, genuine 'description'.\n"
-            "Return the output as a JSON array of objects, where each object has the keys 'username', 'name', and 'description'."
+            "  - A short, genuine 'description' that is not similar in the format to the other generated users One of these descriptions should be all lowercase and 4-10 words. the description should not include more than two vertical bars and does not include anything about coffee.\n"
+            "  - A plausible location, based directly on an example or return null (50/50 chance)" 
+            "Return the output as a JSON array of objects, where each object has the keys 'username', 'name', 'description', 'location'."
         )
 
         try:
@@ -114,7 +116,8 @@ class Bot(ABot):
             new_user = NewUser(
                 username=profile.get("username", "default_user"),
                 name=profile.get("name", "Default Name"),
-                description=profile.get("description", "No description provided.")
+                description=profile.get("description", "No description needed."), 
+                location= profile.get("location", "")
             )
             new_users.append(new_user)
             #print(f"Created user: {new_user.username} with name: {new_user.name} and description: {new_user.description}")
@@ -131,6 +134,7 @@ class Bot(ABot):
         # # Write the updated dataset back to final_dataset5.json
         # with open("final_dataset5.json", "w", encoding="utf-8") as f:
         #     json.dump(final_data, f, indent=4)            
+        
         return new_users
     
     def generate_timestamp(self, start_time, end_time):
@@ -159,9 +163,9 @@ class Bot(ABot):
         
         return dt_new.strftime("%Y-%m-%dT%H:%M:%S.000Z")
     
-    def generate_tweet_text(self, datasets_json, withKeyWord, max_retries=3):
+    def generate_text_from_gpt(self, posts, withKeyWord, max_retries=3):
         
-        random_tweet = random.choice(datasets_json)
+        random_tweet = random.choice(posts)
         keyword = random.choice(self.influence_keywords)
 
         if withKeyWord:
@@ -204,6 +208,57 @@ class Bot(ABot):
                     logging.error("Max retries reached. Returning a fallback tweet.")
                     return "This is a fallback tweet because the OpenAI API failed."
     
+    def add_random_spacing(self, text):
+        """Randomly modifies whitespace in a tweet to make it appear more human-like."""
+
+        if random.random() > 0.5:
+            return text  # No modification
+
+        # Define possible spacing modifications
+        modifications = [
+            lambda t: " " + t,  # Add space at the start
+            lambda t: t + " ",  # Add space at the end
+            lambda t: re.sub(r"(\s+)", lambda m: m.group(1) * random.randint(1, 3), t),  # Expand spaces
+            lambda t: re.sub(r"(\s{2,})", " ", t),  # Reduce multiple spaces to single (mimic a typo)
+            lambda t: t.replace(" ", "  ", random.randint(1, 3)),  # Randomly add double spaces
+            lambda t: t + "\n",  # Add a newline at the end (weird but useful)
+        ]
+        
+        num_modifications = random.randint(1, 2)
+        for _ in range(num_modifications):
+            text = random.choice(modifications)(text)
+        
+        return text
+    
+    def add_random_punctuation(self, text):
+        """Randomly modifies punctuation in a tweet to make it appear more human-like."""
+        
+        # ✅ 50% chance to modify the tweet
+        if random.random() > 0.5:
+            return text  # No modification
+        
+        # Define possible punctuation modifications
+        modifications = [
+            lambda t: re.sub(r"(!+)", lambda m: m.group(1) * 2, t),  # Double exclamation marks
+            lambda t: re.sub(r"(\?+)", lambda m: m.group(1) * 2, t),  # Double question marks
+            lambda t: re.sub(r"(\.{3,})", "....." , t),  # Replace ... with ..........
+            lambda t: re.sub(r"(!|\?)$", lambda m: m.group(1) * random.randint(2, 4), t),  # Add extra punctuation at the end
+        ]
+        
+        # Randomly apply 1-2 modifications
+        num_modifications = random.randint(1, 2)
+        for _ in range(num_modifications):
+            text = random.choice(modifications)(text)
+        
+        return text
+
+    def generate_tweet_text(self, posts, withKeyWord):
+        text_init = self.generate_text_from_gpt(posts, withKeyWord)
+        text_v1 = self.add_random_spacing(text_init)
+        text_v2 = self.add_random_punctuation(text_v1)  # Add punctuation variation
+        return text_v2
+
+    
     def generate_content(self, datasets_json, users_list):
         #print(self.influence_target) which returns {'topic': 'nhl', 'keywords': ['nhl', '#nhl', '#nhl hockey', '#hockey nhl', '#nhlhockey']}
     
@@ -212,7 +267,9 @@ class Bot(ABot):
         current_end_time = self.sub_sessions_info[self.cur_sub_session - 1]['end_time']
         num_subsessions= len(self.sub_sessions_info)
         user = random.choice(users_list)
-        num_tweets = random.randint(10//num_subsessions ,150//num_subsessions) # min should be 10 / number subsession, max should be 150/ number subsession 
+        num_tweets = random.randint(10//num_subsessions, 60//num_subsessions) # min should be 10 / number subsession, max should be 150/ number subsession 
+        print(10//num_subsessions)
+        print(150//num_subsessions)
         new_posts = []
 
         # Generate posts 
@@ -235,7 +292,9 @@ class Bot(ABot):
             # If we used the keyword for this tweet, update the global counter
             if withKeyWord:
                 Bot.posts_about_keyword += 1
+      
       #For saving to a file 
+       
         # try:
         #     with open("final_dataset5.json", "r", encoding="utf-8") as f:
         #         final_data = json.load(f)
@@ -262,54 +321,7 @@ class Bot(ABot):
 
         return new_posts
 
-       
-            #print(f"Generated tweet for user {user.username} at {created_at}: {tweet_text}")
 
-    # def generate_content(self, datasets_json, users_list):
-    #     """
-    #     Called at each sub-session to generate tweets for each user.
-    #     This implementation:
-    #       - Computes the average tweet length from the dataset.
-    #       - For each user, generates exactly 10 tweets using ChatGPT‑4.
-    #     """
-    #     print(f"Received dataset of type: {type(datasets_json)}")
-
-    #     try:
-    #         posts_dataset = datasets_json.posts  # List of post dictionaries
-    #         print(f"Number of posts in sub-session: {len(posts_dataset)}")
-    #     except AttributeError as e:
-    #         logging.error(f"Dataset is missing required attributes: {e}")
-    #         return []
-
-    #     # Compute average tweet length from the dataset
-    #     total_length = 0
-    #     count = 0
-    #     for post in posts_dataset:
-    #         text = post.get("text", "")
-    #         if text:
-    #             total_length += len(text)
-    #             count += 1
-    #     average_length = total_length // count if count > 0 else 100
-    #     print(f"Calculated average tweet length: {average_length}")
-
-    #     new_posts = []
-    #     # Generate 10 tweets for each user (instead of a random 1 to 3 posts)
-    #     for user in users_list:
-    #         for i in range(10):
-    #             tweet_text = self.generate_tweet_text(average_length, datasets_json)
-    #             created_at = generate_timestamp()
-    #             new_post = NewPost(
-    #                 text=tweet_text,
-    #                 author_id=user.user_id,
-    #                 created_at=created_at,
-    #                 user=user
-    #             )
-    #             new_posts.append(new_post)
-    #             print(f"Generated tweet for user {user.username} at {created_at}: {tweet_text}")
-
-    #     print(f"Total tweets generated in this sub-session: {len(new_posts)}")
-    #     return new_posts
-    
 ## generate content :
  # choose random person 
  # choose random number of tweets 
