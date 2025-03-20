@@ -35,15 +35,15 @@ class Bot(ABot):
             examples += f"Username: {username}, Name: {name}, Description: {description}\n"
         
         prompt = (
-            "You are a creative profile generator that creates social media profiles which mimic genuine human behavior. "
-            "Below are examples of existing profiles:\n"
+            "Vous êtes un générateur de français profils créatif qui crée des profils de médias sociaux qui imitent le comportement humain authentique. "
+            "Vous trouverez ci-dessous des exemples de profils existants:\n"
             f"{examples}\n"
-            "Based on these examples, please generate 3 new user profiles. Each profile should have:\n"
-            "  - A 'username' that does not include the word 'bot' or any hint of automation.\n"
-            "  - A natural-sounding full 'name'.\n"
-            "  - A short, genuine 'description' that is not similar in the format to the other generated users One of these descriptions should be all lowercase and 4-10 words. the description should not include more than two vertical bars and does not include anything about coffee.\n"
-            "  - A plausible location, based directly on an example or return null (50/50 chance)" 
-            "Return the output as a JSON array of objects, where each object has the keys 'username', 'name', 'description', 'location'."
+            "À partir de ces exemples, veuillez générer trois nouveaux profils utilisateur. Chaque profil doit contenir:\n"
+            "  - Un « nom d'utilisateur » qui n'inclut pas le mot « bot » ni aucune allusion à l'automatisation.\n"
+            "  - Un « nom » complet qui sonne nature.\n"
+            "  - Une « description » courte et authentique qui n'est pas similaire dans le format aux autres utilisateurs générés. L'une de ces descriptions doit être entièrement en minuscules et comporter de 4 à 10 mots. La description ne doit pas inclure plus de deux barres verticales et n'inclut rien sur le café. ça doit être en français\n"
+            "  - Un emplacement plausible, basé directement sur un exemple" 
+            "Renvoyer la sortie sous forme de tableau JSON d'objets, où chaque objet possède les clés 'username', 'name', 'description', 'location'."
         )
 
         try:
@@ -51,7 +51,7 @@ class Bot(ABot):
             response = openai.chat.completions.create(
                 model="gpt-4o", 
                 messages=[
-                    {"role": "system", "content": "You are a creative profile generator for social media profiles."},
+                    {"role": "system", "content": "Vous êtes un générateur de profils créatifs pour les profils de médias sociaux"},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.8,
@@ -170,21 +170,21 @@ class Bot(ABot):
 
         if withKeyWord:
             topic_variable = self.influence_target.get("topic", "")
-            random_keyword_variable = random.choice(self.influence_target["keywords"])
+            #random_keyword_variable = random.choice(self.influence_target["keywords"])
             prompt = (
-            "You are a creative assistant for generating social media posts. "
-            "Generate tweet text that is similar in format to the text '{random_tweet}', but on the topic of {keyword}. Unless it is about a specifc sporting event, then keep the topic the same"
-            "Be sure to include the word {keyword} somewhere in the tweet"
-            "Return only the tweet text, with no additional commentary or formatting."
+            "Vous êtes un assistant créatif pour générer des publications sur les réseaux sociaux. "
+            "Générer un texte de tweet dont le format est similaire au texte '{random_tweet}', mais sur le sujet de {keyword} et ça doit être en français. À moins qu'il ne s'agisse d'un événement sportif spécifique, gardez le même sujet."
+            "Assurez-vous d'inclure le mot {keyword} quelque part dans le tweet"
+            "Renvoyer uniquement le texte du tweet, sans commentaire ni formatage supplémentaire."
         ).format(random_tweet=random_tweet,
                  topic= topic_variable,
                  keyword= keyword)
         
         else:
             prompt = (
-                "You are a creative assistant for generating social media posts. "
-                "Generate tweet text that is similar in format to the text '{random_tweet}', but on a different topic. Unless it is about a specifc sporting event, then keep the topic the same"
-                "Return only the tweet text, with no additional commentary or formatting."
+                "Vous êtes un assistant créatif pour générer des publications sur les réseaux sociaux. "
+                "Générer un texte de tweet dont le format est similaire au texte '{random_tweet}' À moins qu'il ne s'agisse d'un événement sportif spécifique, gardez le même sujet."
+                "Renvoyer uniquement le texte du tweet, sans commentaire ni formatage supplémentaire."
             ).format(random_tweet=random_tweet)
 
         for attempt in range(max_retries):
