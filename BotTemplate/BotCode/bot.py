@@ -20,7 +20,8 @@ import openai
 import uuid
 
 # sys.stdout.reconfigure(encoding='utf-8')
-openai.api_key= os.getenv('ENV_VAR1')
+# openai.api_key= os.getenv('ENV_VAR1')
+openai.api_key= "sk-svcacct-fvUiXhnMpIuoo_H9lm0DqxZZtI1RSaMxV-DzJljHAowgsxhThaAVApAkhaPwc-T3BlbkFJ9TnyT65V6-nkQqcGKqnafZqANFIYPvCC3DZrTn1DM-xbTwKD_c9mI7Ny_3hu0A"
 
 class Bot(ABot):
     posts_about_keyword = 0
@@ -98,14 +99,13 @@ class Bot(ABot):
             return []
 
     # This global_session_info is just used for the example code, feel free to remove it
-    global_session_info = None
+    #global_session_info = None
 
     def create_user(self, session_info):
         #print(session_info.sub_sessions_info)
         self.sub_sessions_info= session_info.sub_sessions_info
-        self.cur_sub_session= 1
-        global_session_info = session_info
-
+        
+        #global_session_info = session_info
 
         #print("create User called")
         """
@@ -155,54 +155,71 @@ class Bot(ABot):
         return new_users
     
     def generate_content(self, datasets_json, users_list):
+        print('generate_content called')
+        print(self.sub_sessions_info)
+        
+        # Ensure cur_sub_session is initialized (start at 0)
+        if not hasattr(self, 'cur_sub_session'):
+            self.cur_sub_session = 0
 
-        # Determine the current subsession's time boundaries.
-        current_start_time = self.sub_sessions_info[self.cur_sub_session - 1]['start_time']
-        current_end_time = self.sub_sessions_info[self.cur_sub_session - 1]['end_time']
         num_subsessions = len(self.sub_sessions_info)
+        
+        # Check if all subsessions have been processed.
+        if self.cur_sub_session >= num_subsessions:
+            print("All sub-sessions have been processed.")
+            return []
+
+        # Get current sub-session boundaries.
+        current_subsession = self.sub_sessions_info[self.cur_sub_session]
+        current_start_time = current_subsession['start_time']
+        current_end_time = current_subsession['end_time']
+        print(f"Sub-session {self.cur_sub_session + 1}: {current_start_time} - {current_end_time}")
         
         all_new_posts = []
         
-        # Process each user in the list.
-        for user in users_list:
-            # Set a base number of tweets for this user for the current subsession.
-            num_tweets = random.randint(10 // num_subsessions, 60 // num_subsessions)  # min: 10/num_subsessions, max: 150/num_subsessions 
-            
-            # If this is the last subsession, check th user's current post count.
-            if self.cur_sub_session == num_subsessions:
-                # Here we assume that the user object has an attribute 'posts' as a list.
-                current_post_count = len(user.posts) if hasattr(user, 'posts') else 0
+        # Process each user (using enumerate to match posts_examples index).
+        for idx, user in enumerate(users_list):
+            # Calculate a base number of tweets for the current subsession.
+            base_num_tweets = random.randint(10 // num_subsessions, 60 // num_subsessions)
+            current_post_count = len(user.posts) if hasattr(user, 'posts') else 0
+
+            # If the user already has more than 60 posts, generate no tweets.
+            if current_post_count > 60:
+                num_tweets = 0
+            else:
+                num_tweets = base_num_tweets
+
+            # For the last subsession, ensure the user reaches at least 10 posts.
+            if self.cur_sub_session == num_subsessions - 1:
                 if current_post_count < 10:
-                    # Calculate how many more posts are needed to reach a minimum of 10.
                     additional_required = 10 - current_post_count
                     num_tweets = max(num_tweets, additional_required)
-            
-            # Generate posts for this user.
-            for index, user in enumerate(users_list):
-                # Decide whether to include a keyword in this tweet.
-                withKeyWord = False
-                if Bot.posts_about_keyword < 3:
-                    withKeyWord = True
-                for _ in range(num_tweets):
-                        
-                    tweet_text = self.generate_tweet_text(self.posts_examples[index], withKeyWord)
-                    created_at = self.generate_timestamp(current_start_time, current_end_time)
-                    
-                    new_post = NewPost(
-                        text=tweet_text,
-                        author_id=user.user_id,
-                        created_at=created_at,
-                        user=user
-                    )
-                    all_new_posts.append(new_post)
+
+            # Ensure that each user gets at least 2 tweets that include a keyword.
+            if num_tweets < 2:
+                num_tweets = 2
+
+            # Generate tweets for this user.
+            # Force the first two tweets to include a keyword.
+            for tweet_index in range(num_tweets):
+                withKeyWord = tweet_index < 2  # First two tweets get a keyword.
+                tweet_text = self.generate_tweet_text(self.posts_examples[idx], withKeyWord)
+                created_at = self.generate_timestamp(current_start_time, current_end_time)
                 
-                # If the tweet included a keyword, update the global counter.
-                    if withKeyWord:
-                        Bot.posts_about_keyword += 1
-                    Bot.tweet_count += 1
-        
+                new_post = NewPost(
+                    text=tweet_text,
+                    author_id=user.user_id,
+                    created_at=created_at,
+                    user=user
+                )
+                all_new_posts.append(new_post)
+                Bot.tweet_count += 1
+
+        # Increment the sub-session counter for the next call.
+        self.cur_sub_session += 1
+
         return all_new_posts
-    
+        
 
     def generate_timestamp(self, start_time, end_time):
         """
@@ -225,6 +242,8 @@ class Bot(ABot):
         total_seconds = int((dt_end - dt_start).total_seconds())
         random_delay = random.randint(0, total_seconds)
         dt_new = dt_start + timedelta(seconds=random_delay)
+
+        #print(dt_new.strftime("%Y-%m-%dT%H:%M:%S.000Z"))
         
         return dt_new.strftime("%Y-%m-%dT%H:%M:%S.000Z")
     
@@ -277,7 +296,7 @@ class Bot(ABot):
     def add_random_spacing(self, text):
         """Randomly modifies whitespace in a tweet to make it appear more human-like."""
 
-        if random.random() > 0.5:
+        if random.random() > 0.2:
             return text  # No modification
 
         # Define possible spacing modifications
@@ -379,7 +398,7 @@ class Bot(ABot):
         
         return prob, pred
 
-    def generate_tweet_text(self, posts, with_keyword, max_attempts=5):
+    def generate_tweet_text(self, posts, with_keyword, max_attempts=1):
         """
         Generates tweet text using the OpenAI API output and applies spacing and punctuation modifications.
         Returns the first tweet with a prediction probability below 0.2.
