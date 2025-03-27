@@ -106,6 +106,7 @@ class Bot(ABot):
         self.cur_sub_session= 1
         global_session_info = session_info
 
+
         print("create User called")
         """
         Called once at the start of the session.
