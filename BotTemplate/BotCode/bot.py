@@ -101,13 +101,13 @@ class Bot(ABot):
     global_session_info = None
 
     def create_user(self, session_info):
-        print(session_info.sub_sessions_info)
+        #print(session_info.sub_sessions_info)
         self.sub_sessions_info= session_info.sub_sessions_info
         self.cur_sub_session= 1
         global_session_info = session_info
 
 
-        print("create User called")
+        #print("create User called")
         """
         Called once at the start of the session.
         - Extracts influence keywords (if needed) from session_info.metadata.topics.
@@ -403,11 +403,11 @@ class Bot(ABot):
 
             if prob < 0.2:
                 return text_final
-            else:
-                print(f"Attempt {attempt+1}: Tweet rejected (probability: {prob:.4f}). Generating a new one...")
-
-        print(f"Lowest probability after {max_attempts} attempts: {best_prob:.4f}")
+           # else:
+                 #print(f"Attempt {attempt+1}: Tweet rejected (probability: {prob:.4f}). Generating a new one...")
         return best_text
+        #print(f"Lowest probability after {max_attempts} attempts: {best_prob:.4f}")
+        
 
 
     posts_examples = [[
