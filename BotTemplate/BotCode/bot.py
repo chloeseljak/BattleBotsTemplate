@@ -97,6 +97,8 @@ class Bot(ABot):
             logging.error(f"Error calling OpenAI API in generate_human_profiles_from_dataset: {e}")
             return []
 
+    # This global_session_info is just used for the example code, feel free to remove it
+    global_session_info = None
     def create_user(self, session_info):
         print(session_info.sub_sessions_info)
         self.sub_sessions_info= session_info.sub_sessions_info

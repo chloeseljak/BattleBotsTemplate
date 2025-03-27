@@ -15,7 +15,7 @@ session_id = int(os.getenv('SESSION_ID'))
 code_max_time = int(os.getenv('MAX_TIME'))
 
 # Testing Environment Variables
-# session_id = 2
+# session_id = 14
 # code_max_time = 3601
 
 logging.basicConfig(
@@ -54,7 +54,8 @@ try:
 
     logging.info(f"Get Session response status code: {get_session_response.status_code}")
     print("Get Session response status code:", get_session_response.status_code)
-    #print("Get Session response content:", session_dataset.json())
+    #print("Get Session response posts:", session_dataset.posts)
+    
 
     signal.signal(signal.SIGALRM, handler)
     signal.alarm(code_max_time)

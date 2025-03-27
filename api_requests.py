@@ -3,6 +3,7 @@ import requests
 import json
 
 # Competition Environment Variables
+<<<<<<< HEAD
 # base_url = os.getenv('BASE_URL')
 # authentication_token = os.getenv('AUTH_TOKEN')
 # session_id = os.getenv('SESSION_ID')
@@ -12,8 +13,26 @@ base_url = 'http://3.92.68.65:3000/api/test/2'
 
 authentication_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZWFtSWQiOiI1MCIsInRlYW1OYW1lIjoiY2hsb2Vib3QyIiwiaWF0IjoxNzQzMTAyMzA5LCJleHAiOjE3NDMxODg3MDl9.Pg0ta94aKSu4N39_lSsZVbw0_GJMXTc2eu1bBcLnC5U"
 session_id = 2
-
+=======
+base_url = os.getenv('BASE_URL')
+authentication_token = os.getenv('AUTH_TOKEN')
+session_id = os.getenv('SESSION_ID')
 header = {'Authorization': 'bearer ' + authentication_token, 'Content-Type': 'application/json'}
+
+# Testing Environment Variables
+# base_url = 'http://3.92.68.65:3000/api/test/0'
+# try:
+#     login_response = requests.post('http://3.92.68.65:3000/api/auth/login', headers={'Content-Type': 'application/json'}, data=json.dumps({"team_name": "", "team_password": ""}))
+#     login_response.raise_for_status()
+#     authentication_token = login_response.json()["auth_token"]
+# except(requests.exceptions.RequestException) as error:
+#     error_details = error.response.json()
+#     print(f"An error occurred: {error}. Error Message: {error_details.get('message', 'No message available')}")
+>>>>>>> upstream/main
+
+# session_id = 15
+
+# header = {'Authorization': 'bearer ' + authentication_token, 'Content-Type': 'application/json'}
 
 #BOT SECTION
 class SessionInfo:
