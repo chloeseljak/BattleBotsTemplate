@@ -20,8 +20,7 @@ import openai
 import uuid
 
 # sys.stdout.reconfigure(encoding='utf-8')
-# openai.api_key= os.getenv('ENV_VAR1')
-openai.api_key= "sk-svcacct-fvUiXhnMpIuoo_H9lm0DqxZZtI1RSaMxV-DzJljHAowgsxhThaAVApAkhaPwc-T3BlbkFJ9TnyT65V6-nkQqcGKqnafZqANFIYPvCC3DZrTn1DM-xbTwKD_c9mI7Ny_3hu0A"
+openai.api_key= os.getenv('ENV_VAR1')
 
 class Bot(ABot):
     posts_about_keyword = 0
@@ -247,7 +246,7 @@ class Bot(ABot):
         
         return dt_new.strftime("%Y-%m-%dT%H:%M:%S.000Z")
     
-    def generate_text_from_gpt(self, posts, with_keyword, max_retries=3):
+    def generate_text_from_gpt(self, posts, with_keyword, max_retries=5):
         """
         Uses the OpenAI API (GPT-4) to generate tweet text. It chooses a random tweet example and, if with_keyword is True,
         ensures that a keyword is included in the generated text.
