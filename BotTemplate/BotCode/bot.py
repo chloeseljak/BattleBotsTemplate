@@ -20,14 +20,14 @@ import openai
 import uuid
 
 # sys.stdout.reconfigure(encoding='utf-8')
-# openai.api_key= os.getenv('ENV_VAR1')
-openai.api_key= "sk-svcacct-fvUiXhnMpIuoo_H9lm0DqxZZtI1RSaMxV-DzJljHAowgsxhThaAVApAkhaPwc-T3BlbkFJ9TnyT65V6-nkQqcGKqnafZqANFIYPvCC3DZrTn1DM-xbTwKD_c9mI7Ny_3hu0A"
+openai.api_key= os.getenv('ENV_VAR1')
 
 class Bot(ABot):
     posts_about_keyword = 0
     bert_model = SentenceTransformer("all-MiniLM-L6-v2")
     model = joblib.load("xgb_model.joblib")
     tweet_count= 0
+    global_session_info= None 
     
     def generate_human_profiles_from_dataset(self, users_data):
         """
@@ -99,10 +99,12 @@ class Bot(ABot):
 
     # This global_session_info is just used for the example code, feel free to remove it
     global_session_info = None
+
     def create_user(self, session_info):
         print(session_info.sub_sessions_info)
         self.sub_sessions_info= session_info.sub_sessions_info
         self.cur_sub_session= 1
+        global_session_info = session_info
 
         print("create User called")
         """
