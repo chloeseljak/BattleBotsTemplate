@@ -15,7 +15,7 @@ session_id = os.getenv('SESSION_ID')
 
 # session_id = 15
 
-# header = {'Authorization': 'bearer ' + authentication_token, 'Content-Type': 'application/json'}
+header = {'Authorization': 'bearer ' + authentication_token, 'Content-Type': 'application/json'}
 
 #BOT SECTION
 class SessionInfo:
