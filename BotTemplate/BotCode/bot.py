@@ -97,14 +97,10 @@ class Bot(ABot):
             logging.error(f"Error calling OpenAI API in generate_human_profiles_from_dataset: {e}")
             return []
 
-    # This global_session_info is just used for the example code, feel free to remove it
-    #global_session_info = None
-
     def create_user(self, session_info):
-        #print(session_info.sub_sessions_info)
+
         self.sub_sessions_info= session_info.sub_sessions_info
-        
-        #global_session_info = session_info
+    
 
         #print("create User called")
         """
@@ -112,10 +108,8 @@ class Bot(ABot):
         - Extracts influence keywords (if needed) from session_info.metadata.topics.
         - Uses all the existing user profiles from session_info.users as examples to generate 5 new humanlike profiles.
         """
-        
+    
         self.influence_keywords = []
-        # self.start_time = session_info.sub_sessions_info.start_time
-        # self.end_time = session_info.end_time
 
         # Extract metadata from session_info if available (for influence keywords, etc.)
         metadata = {}
@@ -253,9 +247,8 @@ class Bot(ABot):
         """
         all_tweets= posts
         random_tweet = random.choice(posts) if posts else "Just another day"
-        keyword = random.choice(["#fun", "#news", "#trending", "#update"])
+        keyword = random.choice(self.influence_keywords)
         if with_keyword:
-            topic_variable = "general"
             prompt = (
                 "You are a creative assistant for generating social media posts. "
                 "Carefully and completely read these tweets {all_tweets}, and become this person. think like them, act like them, and sound like them. you have these intrests and think these thoughts "
@@ -268,8 +261,7 @@ class Bot(ABot):
             prompt = (
                 "You are a creative assistant for generating social media posts. "
                 "Carefully and completely read these tweets {all_tweets}, and become this person. think like them, act like them, and sound like them. you have these intrests and think these thoughts "
-                "Generate tweet text that is similar in format to the text '{random_tweet}', but with a new topic or idea, that this person, who you are would say. "
-                "Unless it is about a specific sporting event, keep the topic the same. "
+                "Generate tweet text that is consistent with the tone and topics that this person would say "
                 "Return only the tweet text, with no additional commentary or formatting."
             ).format(random_tweet=random_tweet, all_tweets= all_tweets)
         
@@ -413,7 +405,7 @@ class Bot(ABot):
 
             # Get prediction probability for the generated tweet.
             prob, _ = self.predict_tweet(text_final, threshold=0.2)
-
+            
             # Update best if this is lower than what we've seen
             if best_prob is None or prob < best_prob:
                 best_prob = prob
