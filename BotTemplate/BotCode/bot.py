@@ -37,22 +37,22 @@ class Bot(ABot):
         """
         examples = [
             {
-                "username": "SalleyBMitchell",
-                "name": "Salley Mitchell",
-                "description": "the face of horniness and gambling addiction! Player Prop Record: 377-212 | best gut bettor in the world \ud83c\udf0e",
-                "location": "Ballknowerville",
+                "username": "jrobros40",
+                "name": "jimbo baggins",
+                "description": "in darkness light persists\nin light darkness abates",
+                "location": "null",
             },
             {
-                "username": "babyfacedubs",
-                "name": "Curry Flurry \ud83d\ude08",
-                "description": "#Dubnation \u2022 #Stephisbetter \u2022 #Warriors \u2022 Parody Account \u2022 Steph Curry Fan \u2022 Warriors \ud83d\udc99#FreePalestine\ud83c\uddf5\ud83c\uddf8 Follow For More \ud83d\udd25",
-                "location": "Turn On Notifications \ud83d\udccd  ",
+                "username": "319E17th",
+                "name": "Boss Clown",
+                "description": "Sticking to sports is treason.",
+                "location": "Old Ohio",
             },
             {
-                "username": "The_BeatOven",
-                "name": "The Beat-Oven\u2728",
-                "description": "Composer/Arranger/Producer/Mix Engineer||Jacob Collier\ud83d\udc10 & AJR Stan||I make music for People,Brands & Films||Management: @candielips_ / @fosentmt",
-                "location": "New EP out",
+                "username": "LunaMuse",
+                "name": "Luna Harper",
+                "description": "always dreaming in color",
+                "location": "Stargazer's Point",
             }
         ]
 
@@ -65,18 +65,20 @@ class Bot(ABot):
             examples += f"Username: {username}, Name: {name}, Description: {description}\n"
         
         prompt = (
-            "You are a creative profile generator that creates social media profiles which mimic genuine human behavior. "
-            "Below are examples of existing profiles:\n"
-            f"{examples}\n"
-            "Based on these examples, please generate 3 new user profiles. Each profile should have:\n"
-            "  - A 'username' that does not include the word 'bot' or any hint of automation.\n"
-            "  - A natural-sounding full 'name'.\n"
-            "  - A short, genuine 'description' that is not similar in the format to the other generated users and has a 50?50 chance of including an emoji. "
-            "One of these descriptions should be all lowercase and 4-10 words. The description should not include more than two vertical bars and does not include anything about coffee.\n"
-            "  - A plausible location, based loosely on an example. It could be a real location such as a city, a joke, a short (3 word) call out to followers, or return null . "
-            "Return the output as a JSON array of objects, where each object has the keys 'username', 'name', 'description', and 'location'."
-        )
-        
+            "You are an imaginative profile generator tasked with creating authentic social media profiles that sound genuinely human. "
+            "Carefully read the 3 human examples here {examples}"
+            "Create 3 new profiles, basing each profile directly on these examples \n\n"
+            "1. Each profile must include:\n"
+            "   - A 'username' that sounds natural and does not contain the word 'bot' or any reference to automation.\n"
+            "   - A realistic full 'name' (first and last name).\n"
+            "   - A brief 'description' that feels personal and genuine. In 50% of the cases, include one emoji naturally. "
+            "     One of these profiles must have its description entirely in lowercase and contain between 4 and 10 words. "
+            "     Also, ensure that no description has more than two vertical bars ('|') and avoid any mention of coffee.\n"
+            "   - A 'location' that could be a real city, a country, a playful or humorous location, a short (up to three words) shout-out to followers, or null.\n\n"
+            "2. Make sure the profiles vary in style and format so that they do not look too similar to each other.\n\n"
+            "Return the result as a JSON array of objects, where each object has the keys: 'username', 'name', 'description', and 'location'."
+        ).format(examples=examples)
+                
         try:
             time.sleep(2)
             response =  openai.chat.completions.create(
@@ -189,13 +191,13 @@ class Bot(ABot):
                     num_tweets = max(num_tweets, additional_required)
 
             # Ensure that each user gets at least 2 tweets that include a keyword.
-            if num_tweets < 2:
+            if num_tweets< 2:
                 num_tweets = 2
 
             # Generate tweets for this user.
             # Force the first two tweets to include a keyword.
             for tweet_index in range(num_tweets):
-                withKeyWord = tweet_index < 2  # First two tweets get a keyword.
+                withKeyWord = tweet_index < 2 
                 tweet_text = self.generate_tweet_text(self.posts_examples[idx], withKeyWord)
                 created_at = self.generate_timestamp(current_start_time, current_end_time)
                 
@@ -248,29 +250,35 @@ class Bot(ABot):
         all_tweets= posts
         random_tweet = random.choice(posts) if posts else "Just another day"
         keyword = random.choice(self.influence_keywords)
+        
         if with_keyword:
             prompt = (
-                "You are a creative assistant for generating social media posts. "
-                "Carefully and completely read these tweets {all_tweets}, and become this person. think like them, act like them, and sound like them. you have these intrests and think these thoughts "
-                "With all the tweets in mind, Generate tweet text that is similar in format to the text '{random_tweet}', but on the topic of {keyword}. "
-                "Unless it is about a specific sporting event, keep the topic the same. "
-                "Be sure to include the word {keyword} somewhere in the tweet. "
+                "You are a creative social media assistant with a knack for capturing a specific person's style. "
+                "Below are several tweets from this individual: {all_tweets} "
+                "Study these tweets carefully to understand their tone, word choices, interests, and personality. "
+                "Now, generate a new tweet that is similar in style and format to the following example: '{random_tweet}'. "
+                "Your tweet must address the topic of {keyword}—and it must include the word '{keyword}' somewhere in the text. "
+                "If the topic isn't related to a specific sporting event, keep the overall subject consistent. "
                 "Return only the tweet text, with no additional commentary or formatting."
             ).format(random_tweet=random_tweet, keyword=keyword,all_tweets= all_tweets)
         else:
             prompt = (
-                "You are a creative assistant for generating social media posts. "
-                "Carefully and completely read these tweets {all_tweets}, and become this person. think like them, act like them, and sound like them. you have these intrests and think these thoughts "
-                "Generate tweet text that is consistent with the tone and topics that this person would say "
-                "Return only the tweet text, with no additional commentary or formatting."
-            ).format(random_tweet=random_tweet, all_tweets= all_tweets)
+                "You are a creative social media assistant with an exceptional ability to mimic a specific person's writing style. "
+                "Below are a series of tweets written by this individual: {all_tweets} "
+                "Study these tweets carefully to understand every nuance of their voice—pay attention to their tone, word choices, sentence structure, humor, and overall personality. "
+                "Notice the topics they discuss, how they express emotions, and the cultural or contextual references they include. "
+                "Your task is to generate a new tweet that is indistinguishable from one that this person would write. "
+                "Make sure the tweet captures the same energetic or reflective tone, fits with their established style, and aligns with their interests and thoughts as reflected in the examples. "
+                "The tweet should be engaging, authentic, and consistent with the voice of the provided examples. "
+                "Return only the tweet text with no additional commentary, formatting, or explanation."
+            ).format(all_tweets= all_tweets)
         
         for attempt in range(max_retries):
             try:
                 response =  openai.chat.completions.create(
                     model="gpt-4o", 
                     messages=[
-                        {"role": "system", "content": "You are a creative assistant for generating social media posts."},
+                        {"role": "system", "content": "You are a creative social media assistant with an exceptional ability to mimic a specific person's writing style."},
                         {"role": "user", "content": prompt}
                     ],
                     temperature=0.7,
@@ -415,287 +423,8 @@ class Bot(ABot):
                 return text_final
            # else:
                  #print(f"Attempt {attempt+1}: Tweet rejected (probability: {prob:.4f}). Generating a new one...")
+       
         return best_text
         #print(f"Lowest probability after {max_attempts} attempts: {best_prob:.4f}")
         
-
-
-    posts_examples = [[
-    "Not me tho\n\nY'all be safe https://t.co/twitter_link",
-    "If they had given Dafe the wheel at EME in 2012\n\nIt'd have been as big as Universal right now🙂",
-    "I came here for afrobeats head\n\nWhich one is this again https://t.co/twitter_link",
-    "I hate pepper",
-    ("Unrelated but Meta glasses would change the reporting game so much\n\n"
-     "4k recording with normal looking glasses\n\nNo need for phones https://t.co/twitter_link"),
-    ("Because he's the industry fave\n\nNo one wants to name drop and call it out directly\n\n"
-     "God sees all😂\n\nWe go still meet for Afro awards🌞"),
-    ("You know what???\n\nI understand 😂😂 https://t.co/twitter_link"),
-    "No go find food chop 😂 https://t.co/twitter_link",
-    "TAR1Q is special",
-    ("I don't recognize you anymore\n\nWhat have you become? https://t.co/twitter_link"),
-    ("Killing innocents because you're hurt will never ever ever make sense https://t.co/twitter_link"),
-    ("You're a man of culture\n\nElite feet>>> https://t.co/twitter_link"),
-    "https://t.co/twitter_link",
-    ("Okay\n\nLet's have it"),
-    ("You're praying for Palestine on one hand and you're asking the military to go level a local government in Nigeria on the other hand\n\n"
-     "Can you not see how insane you people are?????"),
-    "How are you doing today love ❤️ https://t.co/twitter_link",
-    "Check politics and the banking sector https://t.co/twitter_link",
-    ("You know what?\n\nI'm rocking with it🫡🙂 https://t.co/twitter_link"),
-    ("Afrobeats excellence ❤️\n\nhttps://t.co/twitter_link"),
-    ("Onana at 60 \n\nGrand Celebration"),
-    ("100 years in the FA cup\n\nWe've not lost in 100 years vs Liverpool at Old Trafford https://t.co/twitter_link"),
-    ("He's on 60 now 😂😂😂 https://t.co/twitter_link https://t.co/twitter_link"),
-    ("I'm a Christian\nI'm 46\nI'm still a virgin and I'm not ashamed of it!!!"),
-    ("We won???\n\nNo wayyy😂😂😂"),
-    "Ten Hag will win the FA cup",
-    ("People used to buy lyrics???😂😂😂 https://t.co/twitter_link"),
-    ("Music channels weren't allowed in my house after i gained consciousness 😂😂\n\n"
-     "I started listening to pop music proper in the Justin Bieber era"),
-    ("I'm in my 20's\n\nI'm an old man\n\nI was just not outside like that https://t.co/twitter_link"),
-    ("Here we go again\n\nI'M NOT DEEACHI\n\nIT'S A GABZY X MELVITTO ESQUE THING https://t.co/twitter_link"),
-    ("I randomly shout \"yeeeeee, Tinubuuuuu\"\n\nAnd @mention absolutely hates it😂"),
-    ("This thing is funny\n\nSongs drop every week\n\nDID YOU GUYS BUY THESE BOOKS EVERY WEEK??????"),
-    ("People are constantly in their cars in the US😂 https://t.co/twitter_link"),
-    "Everyone here is in their 20's",
-    ("Y'all niggas OldOld!! https://t.co/twitter_link https://t.co/twitter_link"),
-    ("Whoever this is\n\nHe's a fool https://t.co/twitter_link"),
-    ("👤 FV15valverdee (A🦅¹⁵) — Total Confidence: 169.0"),
-    ("⚽️ \nRamos \nKroos\nValverde \nPulisic \n\n🏀 \nSteph\nKlay\nDraymond \nPodz https://t.co/twitter_link"),
-    ("Valverde got robbed of this goal. Send vin¡&&@ back to his c@mention https://t.co/twitter_link"),
-    ("I hope there is no debate anymore. FEDE VALVERDE IS THE BEST PLAYER IN THE WORLD RN."),
-    "Wait it's the last game of the month?????",
-    ("Valverde got more Assists vs Osasuna (3) today than De Jong and Gavi combined this season(1) 😭😭😭 https://t.co/twitter_link"),
-    ("\"So deserved\" it's always the d0gric  avis😭😭😭 https://t.co/twitter_link"),
-    ("🇺🇾 Fede Valverde vs Osasuna:\n\n"
-     "• 90 minutes\n• 3 assists\n• 4 chances created\n• 2 big chances created\n"
-     "• 48 passes\n• 4 duels won\n• 3 tackles\n• 2 interceptions\n\n"
-     "UNSTOPPABLE. 🤯 @mention 🦅🐐 https://t.co/twitter_link"),
-    "Instagram down?",
-    "Klay is a better midrange shooter than Kobe",
-    "Piggin is actually drunk",
-    "Cumnigga finally fixed his haircut lmao",
-    "What is this defense",
-    "Dray and Kumm😍😍😍",
-    "Ad out for the game yessir",
-    "Currmickey please",
-    "Stay away from my roty you d1rty n&&3r",
-    "How could you miss that Klay😓😓😓",
-    "Klay what are you doing bro",
-    "At least both splash bros having a good game at the same time",
-    "Klay b2b Assists",
-    ("Klay trash talking to Bron again. It might be over for us..."),
-    "Stop fouling this f4tty",
-    "Cumnigga just 2 more Fouls and he'll be fouled out🙏🙏",
-    "How's Draymond Green not in the DPOY talks?",
-    "Why piggins still on the game",
-    "He touched the sideline wtf",
-    "I'm sure the refs got paid that's why they taking too long",
-    "Told yout they paid the refs",
-    "Oh my fckn God this rigged @$$ sht",
-    ("Lakers Ground really tried postponing the game. But Steph goat won it all for the Warriors 😍😍😍😍🐐🐐🐐🐐🫶"),
-    "Good morning",
-    ("Bro you're a r4p1st😭 you going to hell https://t.co/twitter_link"),
-    ("72% of earth is covered by water and the rest is covered by Federico Valverde 🦅 https://t.co/twitter_link"),
-    ("97-year-old NYC diner still serves their Coke the old fashioned way\nhttps://t.co/twitter_link"),
-    "mavs and Nuggets playing playing in 20 minutes???",
-    ("What happened to the \"Sniper\"? https://t.co/twitter_link"),
-    "Mpj is so useless man",
-    "What makes you think that was a foul you weird0s😭😭",
-    "Murry finally",
-    "St1nky foul baiter",
-    "Aaron Gordon is such a fakeass player",
-    ("Doncic cooking for the Nuggets 😍😍😍😍 \"MVP\""),
-    ("ilysm murry😭😭😭😭😭😭🐐🐐🐐🐐🐐"),
-    "Send Gordon to China asap his @$$ can't defend",
-    "Fck you fake a$$ players",
-    ("I was having sv¡c¡dal thoughts everyday then I watched Interstellar and I literally changed my mind. "
-     "I don't wanna d¡€ rn lmao. There's definitely something w this movie... https://t.co/twitter_link"),
-    ("No way Mavs paid the refs😭😭😭😭😭😭😭😭😭😭 https://t.co/twitter_link https://t.co/twitter_link")
-], [
-    "Jus saying I was right on Wendell Carter under on rebounds… I am the rebound wizard",
-    "Top Shelf is bullying me 😢 https://t.co/twitter_link",
-    "Brock Bowers gonna be so mediocre in the NFL, I’m sorry…",
-    "CJ McCollum I literally despise you with every fiber of my being you PrizePicks employee BUM.",
-    "BREAKING: Known PrizePicks employee CJ McCollum has officially been banned from all future plays by Salley B Mitchell. https://t.co/twitter_link",
-    "4-1 so far on PrizePicks Flex Friday picks!  Haaland tomorrow to clutch the 2x 🔥 https://t.co/twitter_link",
-    ("The past 10 days of PrizePicks props:\n\n"
-     "3/15: 4-1 ✅\n"
-     "3/14: 4-2 ✅\n"
-     "3/13: 1-4 ❌\n"
-     "3/12: 6-3 ✅\n"
-     "3/11: 4-1 ✅\n"
-     "3/10: 5-6 ❌\n"
-     "3/9: 6-0 ✅🧹\n"
-     "3/8: 3-3 ☑️\n"
-     "3/7: 5-5 ☑️\n"
-     "3/6: 7-4 ✅\n\n"
-     "61% on props last 10 days, pretty decent. Not my best 10 day stretch though, next one gon be 🔥🔥"),
-    "Allegedly… meaning Sony claimed it 😭 https://t.co/twitter_link",
-    ("I’m going to have to be on my elite defender game when the discourse on Anthony Edwards "
-     "inevitably changes from beloved to hated and despised… NBA media (all media) is terrible and "
-     "hates on every single person eventually."),
-    ("Alright I’m sorry, I’m definitely getting blocked by this guy for saying this, and I know he’s big in "
-     "the community… but cmon man… you aren’t giving out $200 for not sweeping, you damn near never do sweep, "
-     "you are absurdly chalk. You charge $36 for chalk. https://t.co/twitter_link"),
-    ("And if you actually can prove you are consistently giving out that amount of money for not SWEEPING, "
-     "then I’ll hold my L… but it seems crazy scummy"),
-    "Adin Ross is a loser who completely lost touch of reality when he became rich. It’s rather sad, feel bad for his family. https://t.co/twitter_link",
-    ("🔒PrizePicks Locks of the Day 3/16🔒\n\n"
-     "Alex Caruso “U” 13.5 points\n"
-     "Anthony Davis “O” 41.5 PRA\n"
-     "Donovan Mitchell “O” 28.5 pts+ast\n"
-     "Kyle Freeland “U” 4.5 strikeouts\n"
-     "Timo Meier “U” 3.5 SOG\n"
-     "Blake Coleman “U” 2.5 SOG\n\n"
-     "Loving these picks the way I love dicks 🍆 https://t.co/twitter_link"),
-    "Literally gallons are dripping from my beaver https://t.co/twitter_link",
-    ("PRIZEPICKS LOCK OF THE CENTURY!\n\n"
-     "LeBron James has NEVER gone under this line in his entire career. Everything points to at least a one point outing tonight. "
-     "Lock it in 🔒 https://t.co/twitter_link"),
-    "Donovan Mitchell is banned from any further PrizePicks parlays… dude just ruined my day.",
-    "Houston is getting taken to pound town by Iowa St right now, this is crazy.",
-    "Tyrese Haliburton went from being a star to Fred VanVleet in a second…",
-    "to the Jacob I just played in 2k park, you a little biyatch",
-    "1-4 🔥, we really went crazy with this one… nah but fr this is garbage, my bad https://t.co/twitter_link",
-    "OG Anunoby has officially buried me in the grave with this disasterful outing",
-    ("🔒PrizePicks Locks of the Day 3/17🔒\n\n"
-     "Grayson Allen “O” 11.5 points\n"
-     "Giannis “O” 30.5 points\n"
-     "Nikola Jokic “U” 27.5 points\n"
-     "Kyle Connor “U” 19.5 TOI\n"
-     "Will Cuyle “U” 2.5 hits\n"
-     "Brady Tkachuk “O” 20.5 TOI\n"
-     "Kevin Durant “O” 4.0 assists\n\n"
-     "7 plays. The get back. Hell yeah mf. https://t.co/twitter_link"),
-    "3.5K people are confirmed PrizePicks shills… this ain’t hitting respectfully https://t.co/twitter_link",
-    "Grayson Allen is hella good and it pisses me off 😭",
-    "The Bucks and Doc Rivers are A1 at blowing leads",
-    ("🏒NHL PrizePicks Plays 3/17🏒\n\n"
-     "Seth Jones “O” 2.5 SOG\n"
-     "Brenden Dillon “U” 3.5 hits\n"
-     "Patrick Kane “O” 19.25 TOI\n"
-     "Josh Morrissey “O” 2.5 SOG\n"
-     "Connor Bedard “O” 0.5 points 🟢\n"
-     "Lukas Dostal “U” 28.5 saves\n\n"
-     "$20 to someone if we sweep 🧹 https://t.co/twitter_link"),
-    "Luka Doncic is selling me so hard right now, score some points dude",
-    "I’d like to thank my mom, my dad, and Alex Caruso for finally getting a green PrizePicks slip 🔥 https://t.co/twitter_link",
-    "If Jokic scores 12 points in overtime I am literally ending this world.",
-    "If Sam Hauser breaks the three point record that would be comical 😭",
-    "SAM HAUSER HAS 10 THREES WITH 8 MINUTES LEFT IN THE THIRD!",
-    "Nic Claxton over on points was such a bait",
-    ("👤 babyfacedubs (Curry Flurry 😈) — Total Confidence: 184.0\n"
-     "I love and appreciate all you guys the kind words and support means a lot to me ❤️"),
-    "Thank you so much i wouldn’t be here without you guys 🙏🏼",
-    "I was at my lowest point of my life yesterday but i feel a little much better",
-    "So i want to say thanks so much for the kind words ❤️❤️❤️ https://t.co/twitter_link",
-    "biggest game of the season we beating the lakers or nah? https://t.co/twitter_link",
-    "Steph Curry in the building my goat gonna play and drop 60 bomb 🔥https://t.co/twitter_link",
-    "how many points for TJD in Crypto???  https://t.co/twitter_link",
-    "how many points for steph??? https://t.co/twitter_link",
-    "who else feels nervous about this game???",
-    "Come join us on playback biggest game of the season @mention https://t.co/twitter_link",
-    "Lakers free throw merchants always getting foul calls 😂😂😂",
-    "Bro what are we doing? Stop letting AD score 🤦🏻‍♂️",
-    "Can anyone else help Klay wtf are they doing???",
-    "Ugh LEBRON hits a 3 and gets fouls???",
-    "Honest thoughts on this man???? https://t.co/twitter_link",
-    "thoughts on this man??? https://t.co/twitter_link",
-    "Warriors finally beating the Lakers  https://t.co/twitter_link",
-    ("We’ll never witness this kind of showdown again appreciate it while you can "
-     "https://t.co/twitter_link https://t.co/twitter_link"),
-    "when will the game resume??? refs wanna help the lakers we seen this over and over many times",
-    "Warriors vs Lakers game https://t.co/twitter_link",
-    "LETS ALL LAUGH AT LAKERS FANS THE LEAGUE IS RIGGED 😂😂😂😂",
-    ("LAKERS LOSE\n\nTHE WORLD WINS. https://t.co/twitter_link"),
-    ("WARRIORS WIN\n"
-     "WE OWN THE LAKERS\n"
-     "STEPH IS BACK\n"
-     "OLD KLAY IS BACK\n"
-     "KUMINGA INSANE FIRST HALF\n"
-     "DRAYMOND GREAT DEFENSE\n"
-     "TRAYCE WAS COOKING\n"
-     "PODZ PROVING THE HATERS\n"
-     "COMING FOR THE 6TH SEED\n\n"
-     "WE SO BACKKKK https://t.co/twitter_link"),
-    "how does it feel being down there in 10th seed lakers fans??? 😂😂😂 snatched that shit right back https://t.co/twitter_link",
-    "“Steph can’t play defense”",
-    "LOOK AT HIM LOCK UP “LEBRON” IN CLUTCH😂🔥 https://t.co/twitter_link",
-    "out of my 1,500 followers who will help me pic a profile pic??? https://t.co/twitter_link",
-    "CP3 instagram story “WEIRDOS…”who is he talking about??? https://t.co/twitter_link",
-    "So nobody slandering Jokic for playing ass 😭 https://t.co/twitter_link",
-    "are the warriors gonna win all these games or nah https://t.co/twitter_link",
-    "SAM HAUSER INJURED AFTER MAKING 10 THREES 💔 https://t.co/twitter_link"
-], [
-    ("Ramos \n"
-     "Kroos\n"
-     "Valverde \n"
-     "Pulisic \n\n"
-     "🏀 \n"
-     "Steph\n"
-     "Klay\n"
-     "Draymond \n"
-     "Podz https://t.co/twitter_link"),
-     
-    "Valverde got robbed of this goal. Send vin¡&&@ back to his c@mention https://t.co/twitter_link",
-    "I hope there is no debate anymore. FEDE VALVERDE IS THE BEST PLAYER IN THE WORLD RN.",
-    "Wait it's the last game of the month?????",
-    "Valverde got more Assists vs Osasuna (3) today than De Jong and Gavi combined this season(1) 😭😭😭 https://t.co/twitter_link",
-    "\"So deserved\" it's always the d0gric  avis😭😭😭 https://t.co/twitter_link",
-    ("🇺🇾 Fede Valverde vs Osasuna:\n\n"
-     "• 90 minutes\n"
-     "• 3 assists\n"
-     "• 4 chances created\n"
-     "• 2 big chances created\n"
-     "• 48 passes\n"
-     "• 4 duels won\n"
-     "• 3 tackles\n"
-     "• 2 interceptions\n\n"
-     "UNSTOPPABLE. 🤯 @mention 🦅🐐 https://t.co/twitter_link"),
-    "Instagram down?",
-    "Klay is a better midrange shooter than Kobe",
-    "Piggin is actually drunk",
-    "Cumnigga finally fixed his haircut lmao",
-    "What is this defense",
-    "Dray and Kumm😍😍😍",
-    "Ad out for the game yessir",
-    "Currmickey please",
-    "Stay away from my roty you d1rty n&&3r",
-    "How could you miss that Klay😓😓😓",
-    "Klay what are you doing bro",
-    "At least both splash bros having a good game at the same time",
-    "Klay b2b Assists",
-    "Klay trash talking to Bron again. It might be over for us...",
-    "Stop fouling this f4tty",
-    "Cumnigga just 2 more Fouls and he'll be fouled out🙏🙏",
-    "How's Draymond Green not in the DPOY talks?",
-    "Why piggins still on the game",
-    "He touched the sideline wtf",
-    "I'm sure the refs got paid that's why they taking too long",
-    "Told yout they paid the refs",
-    "Oh my fckn God this rigged @$$ sht",
-    ("Lakers Ground really tried postponing the game. But Steph goat won it all for the Warriors "
-     "😍😍😍😍🐐🐐🐐🐐🫶"),
-    "Good morning",
-    "Bro you're a r4p1st😭 you going to hell https://t.co/twitter_link",
-    ("72% of earth is covered by water and the rest is covered by Federico Valverde 🦅 "
-     "https://t.co/twitter_link"),
-    ("97-year-old NYC diner still serves their Coke the old fashioned way\n"
-     "https://t.co/twitter_link"),
-    "mavs and Nuggets playing playing in 20 minutes???",
-    "What happened to the \"Sniper\"? https://t.co/twitter_link",
-    "Mpj is so useless man",
-    "What makes you think that was a foul you weird0s😭😭",
-    "Murry finally",
-    "St1nky foul baiter",
-    "Aaron Gordon is such a fakeass player",
-    "Doncic cooking for the Nuggets 😍😍😍😍 \"MVP\"",
-    "ilysm murry😭😭😭😭😭😭🐐🐐🐐🐐🐐",
-    "Send Gordon to China asap his @$$ can't defend",
-    "Fck you fake a$$ players",
-    ("I was having sv¡c¡dal thoughts everyday then I watched Interstellar and I literally changed my mind. "
-     "I don't wanna d¡€ rn lmao. There's definitely something w this movie... https://t.co/twitter_link"),
-    ("No way Mavs paid the refs😭😭😭😭😭😭😭😭😭😭 "
-     "https://t.co/twitter_link https://t.co/twitter_link")
-]]
+    posts_examples = [['   Fred VanVleet   has officially  sent me  into  oblivion  with  this  catastrophic performance.', 'Why is nobody boxing out on rebounds? Come on team, hustle up! 🤦🏻\u200d♂️', " The past 10 days of NBA takes:\n\n3/15: Steph MVP case ✅\n3/14: Lakers overhyped ❌\n3/13: Warriors defense on point ✅\n3/12: Jokic not clutch ❌\n3/11: LeBron still the king ✅\n3/10: AD can’t carry ❌\n3/9: Klay back to form ✅\n3/8: Nets contenders? ☑️\n3/7: Bucks unstoppable ☑️\n3/6: Grizzlies underrated ✅\n\nSolid 60% hit rate on takes, but I'm ready to step it up next time! 🔥🏀", 'Jordan  Poole  under  on assists was such a trap.', 'Jalen Green went from being the next big thing to just another player in the blink of an eye…', ' PRIZEPICKS DOMINATION  \n  \nWE  HIT   BIG TODAY  \n  \n  \nCARUSO   CAME THROUGH  \n  \nANTHONY  DAVIS ON FIRE  \n  \n  \nMITCHELL   REDEEMED  HIMSELF  \n  \nFREELAND  UNDER LOCKED IN  \n  \nCOLEMAN  WITH  THE  CLUTCH  \n\nWE  SO  UP RIGHT  NOW 🔥🔥  https://t.co/twitter_link', ' BREAKING: Known gamer Adin Ross has officially been banned from all future online lobbies by Salley B Mitchell. https://t.co/twitter_link\n', 'LOOK AT HIM BREAKING ANKLES ON THE COURT, UNSTOPPABLE 😂🔥 https://t.co/twitter_link', "Julius   Randle   I   literally   can't  stand your  shot   selection,   it's   like   you're  allergic  to  passing  the  ball.", "If  you can actually prove LeBron isn't benefiting from all these phantom calls, then I'll admit I'm wrong… but it seems pretty sketchy. ", "Ben Simmons I literally cannot stand how you play every game like it's practice, you overpaid bench warmer.", 'PRIZEPICKS  DOMINATION   \nMY PICKS WERE ON FIRE  \nCARUSO CASHED IN  \nANTHONY DAVIS DOMINATED  \nMEIER WAS A LOCK  \nCOLEMAN CAME THROUGH  \nJOKIC PROVED THE DOUBTERS WRONG  \n\nFEELING UNSTOPPABLE 🔥 https://t.co/twitter_link', "“Giannis can't shoot threes”", '🏀NBA PrizePicks Plays 3/18🏀\n\nJayson Tatum “O” 27.5 points\nBam Adebayo “U” 9.5 rebounds\nKyrie Irving “O” 6.5 assists\nZion Williamson “U” 1.5 steals\nKlay Thompson “O” 4.5 threes\nChris Paul “U” 18.5 points+assists\n\n$20 to someone if we sweep 🧹 https://t.co/twitter_link', 'Ugh JOKIC misses another layup???', 'Literally drowning in my own thoughts right now 😂 https://t.co/twitter_link ', 'The last 10 days of NBA drama:\n\n3/15: Lakers lose 😂\n3/14: Warriors win 🔥\n3/13: Klay shines 🌟\n3/12: LeBron struggles ❌\n3/11: Steph goes off ✅\n3/10: AD dominates 🤦🏻\u200d♂️\n3/9: Warriors sweep 🧹\n3/8: Lakers choke 🥴\n3/7: Curry clutch ✅\n3/6: Lakers fall short ❌\n\nWarriors are on fire, next week’s gonna be even crazier! 🔥🏀 ', 'We’ll never see a player like Steph again, savor every splash while you can 🎯🏀 https://t.co/twitter_link https://t.co/twitter_link', "LeBron's latest post is just him smirking… what's he hinting at??? 😂🔥 https://t.co/twitter_link", 'Do we really trust Harden in the playoffs???????????? 🤔 https://t.co/twitter_link', " 4K people are officially part of the Fantasy Football hype… this season's gonna be wild respectfully 😤 https://t.co/twitter_link", 'DAMIAN    LILLARD DROPS  50  WITH  6  MINUTES   LEFT  IN THE  FOURTH!', '🏀NBA PrizePicks Plays 3/18🏀 Jayson Tatum “O” 27.5 points Devin Booker “U” 6.5 assists Klay Thompson “O” 3.5 threes\nBam Adebayo “U” 10.5 rebounds Trae Young “O” 8.5 assists Julius Randle “U” 25.5 points $50 to someone if we sweep 🧹 https://t.co/twitter_link', '3-0 so far on the weekend picks! Messi tomorrow to seal the hat-trick 🔥 https://t.co/twitter_link ', 'LETS ALL LAUGH AT THE KNICKS FANS THINKING THEY HAD A CHANCE 😂😂😂😂', ' Miami is getting absolutely demolished by Boston right now, this is wild.'], ['Sounds like a whackin’s afoot! https://t.co/twitter_link', 'Sorry guys. @mention \n\nhttps://t.co/twitter_link.', 'Everyone knows that the Gays hate boobs. https://t.co/twitter_link', 'Beauty for Fields in Pittsburgh is they have no investment in the “starter.”  No reason he can’t compete and win that job.', 'Just found out my daughters are graduating on Star Wars Day 2025. Are you available to speak, @mention @mention?', 'AHL product, @mention prices. Go Jackets! \n#CBJ', 'Curious, do you track xga by goal or know someone who does, @mention? i.e. the average xg on actual goals for Elvis Merzlikins.', 'Shocked that a lineup including Brendan Gaunce, Mathieu Olivier, Jake Christianson, Trey Fix-Wolansky, Carson Meyer, and Michael Pyythia  looks underwhelming against an NHL lineup. #CBJ', 'OTOH, I want to leave; OTOH I want to boo this team at the end. #CBJ https://t.co/twitter_link', 'I bring the fam down twice or thrice a year just to keep hope alive, cos I’m the only one who cares. \n\nI’m out on #CBJ hockey. I can’t justify why we’re even here.', 'We suck. 5 at least of the forwards tonight are AHL talents. Elvis has allowed 5 goals on maybe 2.5 XG? https://t.co/twitter_link'], ['I wish I could remember who wrote it, I read an article last year sometime talking about how America is an incredibly convoluted series of overlapping systems - and once even one of these industries begins to spiral, it will unravel the entire thing in catastrophic fashion https://t.co/twitter_link', 'The shipping industry is responsible for import and export of goods. Logistics industry transports these goods all over the country. Healthcare, education, economic industries all rely on logistics to get the required physical materials to function.', 'Shipping and logistics industries rely on Healthcare and economic industries to keep workers healthy and educated etc etc', 'If you wanna shift the goalpost a little to make him look even worse you could go back to 2013 when he praised China\'s "basic dictatorship"\n\nhttps://t.co/twitter_link https://t.co/twitter_link', "Lil Sparkle Socks looks like he's on the verge of tears https://t.co/twitter_link https://t.co/twitter_link", "Planned Parenthood and other abortion providers are the modern day Temple of Moloch and people like you are it's priests and priestesses https://t.co/twitter_link", "Wasn't there a security guard on 9/11 who had a bad feeling about one of the literal hijackers but also didn't want to appear racist and waved him through? https://t.co/twitter_link", 'It was a big deal at my school when we got a computer lab with a couple of these bad boys in it https://t.co/twitter_link https://t.co/twitter_link', 'Lil Sparkle Socks when he has to face the consequences of his actions \n\n(Leaving an event out of the back door because of a pro-Palestine mob in the front) https://t.co/twitter_link https://t.co/twitter_link', "Lil Sparkle Socks looks like he's on the verse of tears leaving an event out of the back door because of a pro-Palestine mob out front\n\nThink he's starting to realize the consequences of his actions yet? https://t.co/twitter_link https://t.co/twitter_link", 'Trevor from Black Dahlia. Brother lived and breathed metal and genuinely loved people and fans. \n\nHe also showed love to Christian metal bands when most people shit on them; I might be in the minority but that meant a lot\n\nHe was a fuckin good dude who was taken from us too soon https://t.co/twitter_link', 'This is cheating but I also wanna say David Gold. He spoke to so many people and yet Woods of Ypres is still so obscure; virtually everyone who finds his work resonates with it, the man communicated on a different level from all of us, that we all can relate to https://t.co/twitter_link', "Keep getting your boosters, friend. It's in the best interests of the public https://t.co/twitter_link https://t.co/twitter_link", "Did I misunderstand the question?\n\nI don't think it's gotten any harder for Trudeau's children to function.\n\nCanada thought they done with Pierre, yet here we are. Who's to say 40 years from now Canadians aren't cursing the next Trudeau all over again? https://t.co/twitter_link", "Everyone talking like you're coming back from this. There is no coming back from $34T in debt and $300B being added daily. \n\nThey are intentionally crashing the economy to force everyone into the new digital one built on the block chain.\n\nhttps://t.co/twitter_link https://t.co/twitter_link", "100%\n\nOnly cure is to turn off (I write from my device I've been browsing for the last 15 minutes)\n\nSeriously though, the further we can get away from our devices, the better. I'm seriously considering switching back to a flip phone https://t.co/twitter_link"]]
