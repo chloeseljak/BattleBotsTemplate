@@ -57,7 +57,7 @@ class Bot(ABot):
         ]
 
         # Build examples string from provided dataset examples (you can add your dataset examples)
-        for user in users_data[:2]:
+        for user in users_data[:2]: #0 indexing me who sees this its right
             username = user.get("username", "default")
             name = user.get("name", "No Name")
             description = user.get("description", "No description provided.")
