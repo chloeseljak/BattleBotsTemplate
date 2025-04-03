@@ -20,7 +20,7 @@ import openai
 import uuid
 
 # sys.stdout.reconfigure(encoding='utf-8')
-openai.api_key= "sk-svcacct-fvUiXhnMpIuoo_H9lm0DqxZZtI1RSaMxV-DzJljHAowgsxhThaAVApAkhaPwc-T3BlbkFJ9TnyT65V6-nkQqcGKqnafZqANFIYPvCC3DZrTn1DM-xbTwKD_c9mI7Ny_3hu0A"
+openai.api_key= os.getenv('ENV_VAR1')
 
 class Bot(ABot):
     posts_about_keyword = 0
